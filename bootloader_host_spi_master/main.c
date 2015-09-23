@@ -29,15 +29,16 @@
 #include "dfu_spi_master_lib.h"
 #include "crc16.h"
 
-#define HOST_SPI_MASTER_APP_START   0x3C000
+#define HOST_SPI_MASTER_APP_START   0x0
 
-#define HOST_SD_REGION_START        0x1000
-#define HOST_SD_REGION_END          0x18000
+#define HOST_SD_REGION_START        0x11000
+#define HOST_SD_REGION_END          0x30000
 
-#define HOST_APP_REGION_START       0x18000
-#define HOST_APP_REGION_END         0x1C000
+#define HOST_APP_REGION_START       0x30000
+#define HOST_APP_REGION_END         0x38000
 
-uint32_t m_uicr_bootloader_start_address __attribute__((at(0x10001000 + 0x14))) = HOST_SPI_MASTER_APP_START;            /**< This variable ensures that the linker script will write the bootloader start address to the UICR register. This value will be written in the HEX file and thus written to UICR when the bootloader is flashed into the chip. */
+#define HOST_BL_REGION_START        0x38000
+#define HOST_BL_REGION_END          0x3C000
 
 // Simple algorithm for finding the end of the firmware image in the flash
 // Assumes that there is nothing stored in the flash after the image, otherwise it will fail
@@ -89,6 +90,14 @@ void test_update(uint8_t mode)
     
     else if(mode == DFU_UPDATE_BL)
     {
+        new_image_start = HOST_BL_REGION_START;
+        
+        // Find the size of the image programmed into the flash
+        new_image_size = find_image_size(HOST_BL_REGION_START, HOST_BL_REGION_END);
+    
+        // Find the CRC of the image programmed into the flash
+        new_image_crc  = find_image_crc(HOST_BL_REGION_START, new_image_size);
+        
         start_packet.bl_image_size = new_image_size;
     }
     else if(mode == DFU_UPDATE_SD)
@@ -150,11 +159,11 @@ int main(void)
         }
         else if(nrf_gpio_pin_read(BUTTON_2) == 0)
         {
-            test_update(DFU_UPDATE_BL);
+            test_update(DFU_UPDATE_SD);
         }
         else if(nrf_gpio_pin_read(BUTTON_3) == 0)
         {
-            test_update(DFU_UPDATE_SD);
+            test_update(DFU_UPDATE_BL);
         }
         
         nrf_gpio_pin_toggle(24);
