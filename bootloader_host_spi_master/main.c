@@ -29,14 +29,21 @@
 #include "dfu_spi_master_lib.h"
 #include "crc16.h"
 
-#define APPLICATION_HEX_LOCATION    0x18000
-#define DFU_IMAGE_REGION_END        0x40000 //- APPLICATION_HEX_LOCATION
+#define HOST_SPI_MASTER_APP_START   0x3C000
+
+#define HOST_SD_REGION_START        0x1000
+#define HOST_SD_REGION_END          0x18000
+
+#define HOST_APP_REGION_START       0x18000
+#define HOST_APP_REGION_END         0x1C000
+
+uint32_t m_uicr_bootloader_start_address __attribute__((at(0x10001000 + 0x14))) = HOST_SPI_MASTER_APP_START;            /**< This variable ensures that the linker script will write the bootloader start address to the UICR register. This value will be written in the HEX file and thus written to UICR when the bootloader is flashed into the chip. */
 
 // Simple algorithm for finding the end of the firmware image in the flash
 // Assumes that there is nothing stored in the flash after the image, otherwise it will fail
-uint32_t find_image_size(uint32_t start_address)
+uint32_t find_image_size(uint32_t start_address, uint32_t end_address)
 {
-    uint32_t img_size = DFU_IMAGE_REGION_END - 4;
+    uint32_t img_size = end_address - 4;
     while(img_size > start_address)
     {
         if(*((uint32_t*)img_size) != 0xFFFFFFFF) break;
@@ -56,33 +63,47 @@ uint16_t find_image_crc(uint32_t start_address, uint32_t image_size)
 // This function will update an application, stored in local flash at the address APPLICATION_HEX_LOCATION
 void test_update(uint8_t mode)
 {
-    // Find the size of the image programmed into the flash
-    uint32_t new_image_size = find_image_size(APPLICATION_HEX_LOCATION);
-    
-    // Find the CRC of the image programmed into the flash
-    uint16_t new_image_crc  = find_image_crc(APPLICATION_HEX_LOCATION, new_image_size);
-    
-    nrf_gpio_pin_clear(21);
-    
     // Send START packet
     dfu_start_packet_t start_packet = {.dfu_update_mode = mode,
                                        .sd_image_size = 0,
                                        .bl_image_size = 0,
                                        .app_image_size = 0};  
     
+    uint32_t new_image_start, new_image_size;
+    uint16_t new_image_crc;
+    
+    nrf_gpio_pin_clear(21);
+    
     if(mode == DFU_UPDATE_APP)
     {
+        new_image_start = HOST_APP_REGION_START;
+        
+        // Find the size of the image programmed into the flash
+        new_image_size = find_image_size(HOST_APP_REGION_START, HOST_APP_REGION_END);
+    
+        // Find the CRC of the image programmed into the flash
+        new_image_crc  = find_image_crc(HOST_APP_REGION_START, new_image_size);
+        
         start_packet.app_image_size = new_image_size;
     }
+    
     else if(mode == DFU_UPDATE_BL)
     {
         start_packet.bl_image_size = new_image_size;
     }
     else if(mode == DFU_UPDATE_SD)
     {
+        new_image_start = HOST_SD_REGION_START;
+        
+       // Find the size of the image programmed into the flash
+        new_image_size = find_image_size(HOST_SD_REGION_START, HOST_SD_REGION_END);
+    
+        // Find the CRC of the image programmed into the flash
+        new_image_crc  = find_image_crc(HOST_SD_REGION_START, new_image_size);
+
         start_packet.sd_image_size = new_image_size;
     }
-                                  
+                                
     dfu_spi_send_start_packet(&start_packet);
                                        
     nrf_delay_ms(2500);
@@ -95,7 +116,7 @@ void test_update(uint8_t mode)
     nrf_delay_ms(1500);
     
     // Send DATA
-    uint8_t *app_image_addr = (uint8_t*)APPLICATION_HEX_LOCATION;
+    uint8_t *app_image_addr = (uint8_t*)new_image_start;
     for(int i = 0; i < new_image_size; i += 128)
     {
         uint32_t bytes_to_write = new_image_size - i;
