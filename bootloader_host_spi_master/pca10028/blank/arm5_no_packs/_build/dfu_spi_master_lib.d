@@ -1,0 +1,17 @@
+.\_build\dfu_spi_master_lib.o: ..\..\..\dfu_spi_master_lib.c
+.\_build\dfu_spi_master_lib.o: ..\..\..\dfu_spi_master_lib.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\libraries\bootloader_dfu\dfu_types.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\device\nrf51.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cm0.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmInstr.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmFunc.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\toolchain\system_nrf51.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\libraries\util\app_util.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\device\compiler_abstraction.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\device\nrf.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\device\nrf51_bitfields.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\..\..\..\components\device\nrf51_deprecated.h
+.\_build\dfu_spi_master_lib.o: ..\..\..\spi_master_com_interface.h
+.\_build\dfu_spi_master_lib.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

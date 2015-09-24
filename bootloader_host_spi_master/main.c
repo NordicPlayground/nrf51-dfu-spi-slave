@@ -40,6 +40,8 @@
 #define HOST_BL_REGION_START        0x38000
 #define HOST_BL_REGION_END          0x3C000
 
+static uint8_t random_number[4]; // used to inject in BL image in order to change CRC from previous upload - used for testing
+
 // Simple algorithm for finding the end of the firmware image in the flash
 // Assumes that there is nothing stored in the flash after the image, otherwise it will fail
 uint32_t find_image_size(uint32_t start_address, uint32_t end_address)
@@ -61,6 +63,25 @@ uint16_t find_image_crc(uint32_t start_address, uint32_t image_size)
     return crc16_compute((const uint8_t *)start_address, image_size, 0);
 }
 
+void get_rand_num(uint8_t * rand_buffer)
+{
+    uint8_t i = 0;
+    
+    NRF_RNG->CONFIG = 1;
+    NRF_RNG->TASKS_START = 1;
+    
+    do
+    {
+        while(NRF_RNG->EVENTS_VALRDY == 0);
+        NRF_RNG->EVENTS_VALRDY = 0;
+        rand_buffer[i++] = NRF_RNG->VALUE;
+        
+    }while(i<4);
+    
+    NRF_RNG->TASKS_STOP;
+       
+}
+
 // This function will update an application, stored in local flash at the address APPLICATION_HEX_LOCATION
 void test_update(uint8_t mode)
 {
@@ -73,6 +94,8 @@ void test_update(uint8_t mode)
     uint32_t new_image_start, new_image_size;
     uint16_t new_image_crc;
     
+    get_rand_num(random_number);
+                                       
     nrf_gpio_pin_clear(21);
     
     if(mode == DFU_UPDATE_APP)
@@ -81,7 +104,7 @@ void test_update(uint8_t mode)
         
         // Find the size of the image programmed into the flash
         new_image_size = find_image_size(HOST_APP_REGION_START, HOST_APP_REGION_END);
-    
+        
         // Find the CRC of the image programmed into the flash
         new_image_crc  = find_image_crc(HOST_APP_REGION_START, new_image_size);
         
@@ -94,11 +117,15 @@ void test_update(uint8_t mode)
         
         // Find the size of the image programmed into the flash
         new_image_size = find_image_size(HOST_BL_REGION_START, HOST_BL_REGION_END);
-    
+        
         // Find the CRC of the image programmed into the flash
+
         new_image_crc  = find_image_crc(HOST_BL_REGION_START, new_image_size);
         
-        start_packet.bl_image_size = new_image_size;
+        new_image_crc  = crc16_compute(random_number,4,&new_image_crc);
+   
+        
+        start_packet.bl_image_size = new_image_size + 4;
     }
     else if(mode == DFU_UPDATE_SD)
     {
@@ -132,7 +159,13 @@ void test_update(uint8_t mode)
         if(bytes_to_write > 128) bytes_to_write = 128;
         dfu_spi_send_data_packet(app_image_addr + i, bytes_to_write);
         nrf_delay_ms(15);
-    }    
+    }
+    
+    if(mode == DFU_UPDATE_BL)
+    {
+       dfu_spi_send_data_packet(random_number,sizeof(uint32_t));
+       nrf_delay_ms(15);        
+    }
     
     // Send STOP
     dfu_spi_send_stop_packet();
@@ -149,8 +182,27 @@ int main(void)
     nrf_gpio_range_cfg_output(21, 24);
     NRF_GPIO->OUTSET = 0xF << 21;
     
+    nrf_gpio_cfg_output(7);
+    
+    nrf_gpio_pin_clear(7);
+    
     dfu_spi_init();
     
+    while(1)
+    {
+      nrf_gpio_pin_clear(7);
+      nrf_delay_ms(20);
+      nrf_gpio_pin_set(7);
+      test_update(DFU_UPDATE_BL);
+      nrf_delay_ms(1000);
+      nrf_gpio_pin_toggle(24);
+      
+      
+    }
+    
+    //test_update(DFU_UPDATE_BL);
+    
+    /*
     while(1)
     {
         if(nrf_gpio_pin_read(BUTTON_1) == 0)
@@ -165,10 +217,10 @@ int main(void)
         {
             test_update(DFU_UPDATE_BL);
         }
-        
-        nrf_gpio_pin_toggle(24);
-        nrf_delay_ms(50);
-    }
+        */
+        //nrf_gpio_pin_toggle(24);
+        //nrf_delay_ms(50);
+    //}
 }
 
 

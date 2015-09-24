@@ -1,0 +1,15 @@
+--cpu Cortex-M0
+".\_build\main.o"
+".\_build\dfu_spi_master_lib.o"
+".\_build\nrf_soc.o"
+".\_build\app_error.o"
+".\_build\crc16.o"
+".\_build\spi_master_com_interface.o"
+".\_build\nrf_delay.o"
+".\_build\spi_master.o"
+".\_build\arm_startup_nrf51.o"
+".\_build\system_nrf51.o"
+--library_type=microlib --strict --scatter ".\_build\nrf51422_xxac.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\_build\nrf51422_xxac.map" -o .\_build\nrf51422_xxac.axf

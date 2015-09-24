@@ -1,0 +1,12 @@
+.\_build\nrf_flash.o: ..\..\..\nrf_flash.c
+.\_build\nrf_flash.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\_build\nrf_flash.o: ..\..\..\nrf_flash.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\device\nrf.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\device\nrf51.h
+.\_build\nrf_flash.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cm0.h
+.\_build\nrf_flash.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmInstr.h
+.\_build\nrf_flash.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmFunc.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\toolchain\system_nrf51.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\device\nrf51_bitfields.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\device\nrf51_deprecated.h
+.\_build\nrf_flash.o: ..\..\..\..\..\..\components\device\compiler_abstraction.h
