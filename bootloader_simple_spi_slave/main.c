@@ -58,8 +58,6 @@
 #error "Not enough LEDs on board"
 #endif
 
-const uint32_t m_randomization_word __attribute__((at(BOOTLOADER_REGION_START + 0x600))) = 0x01010101;            /**< This variable ensures that the linker script will write the bootloader start address to the UICR register. This value will be written in the HEX file and thus written to UICR when the bootloader is flashed into the chip. */
-
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
 #define BOOTLOADER_BUTTON               BSP_BUTTON_3                                            /**< Button used to enter SW update mode. */

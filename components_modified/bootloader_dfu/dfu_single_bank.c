@@ -724,7 +724,7 @@ uint32_t dfu_bl_image_validate(void)
     if (bootloader_settings.bl_image_size != 0)
     {
         uint32_t bl_image_start = (bootloader_settings.sd_image_size == 0) ?
-                                  DFU_BANK_0_REGION_START :
+                                  bootloader_settings.bl_image_start :
                                   bootloader_settings.sd_image_start +
                                   bootloader_settings.sd_image_size;
 

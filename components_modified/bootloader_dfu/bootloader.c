@@ -172,6 +172,7 @@ void bootloader_dfu_update_process(dfu_update_status_t update_status)
         settings.sd_image_size  = update_status.sd_size;
         settings.bl_image_size  = update_status.bl_size;
         settings.app_image_size = update_status.app_size;
+        settings.bl_image_start = CODE_REGION_1_START;
 
         m_update_status         = BOOTLOADER_SETTINGS_SAVING;
         bootloader_settings_save(&settings);
@@ -358,5 +359,6 @@ void bootloader_settings_get(bootloader_settings_t * const p_settings)
     p_settings->bl_image_size  = p_bootloader_settings->bl_image_size;
     p_settings->app_image_size = p_bootloader_settings->app_image_size;
     p_settings->sd_image_start = p_bootloader_settings->sd_image_start;
+    p_settings->bl_image_start = p_bootloader_settings->bl_image_start;
 }
 
