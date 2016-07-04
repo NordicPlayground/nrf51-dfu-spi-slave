@@ -9,8 +9,8 @@ layer to use SPI slave instead of UART/HCI.
 Included is an example host application allowing one nRF51 kit to flash another for demonstration 
 and test purposes. 
 
-The example host application can currently only program an application (not a bootloader or SoftDevice), 
-and expects the application binary to be programmed into address 0x18000 of the flash. 
+The example host application can program an application or softdevice or bootloader. It expects the application binary to be programmed into address 0x18000 of the flash. 
+
 The host application itself runs from address 0x0000, and does not use a SoftDevice. 
 To 'prime' the host application simply flash the application binary first, followed by flashing the host application itself.
 The host application will blink an LED when running, and pressing button 1 will start a transfer. 
